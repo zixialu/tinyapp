@@ -48,6 +48,14 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+// Delete url
+// TODO: Change this to use DELETE and not POST
+app.post('/urls/:id/delete', (req, res) => {
+  delete urlDatabase[req.params.id];
+  // Send a 303 redirect to /urls
+  res.redirect(303, `/urls`);
+});
+
 // Redirect to longURL
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
