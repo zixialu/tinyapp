@@ -20,7 +20,7 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-// POST new url form
+// POST new url form data
 app.post('/urls', (req, res) => {
   let shortURL = generateRandomString();
 
