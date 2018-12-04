@@ -20,6 +20,13 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
+// POST new url form
+app.post('/urls', (req, res) => {
+  console.log(req.body);
+  // TODO: Implement actual behaviour
+  res.send('Ok');
+})
+
 // New url form
 app.get('/urls/new', (req, res) => {
   res.render('urls_new');
