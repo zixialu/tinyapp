@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-
 const PORT = 8080; // default port 8080
 
 // Set view engine to ejs
@@ -11,24 +10,31 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-// Adding routes
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-// Sending HTML
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
 });
+
+app.get("/urls/:id", (req, res) => {
+  const shortURL = req.params.id;
+  const longURL = urlDatabase[shortURL];
+  let templateVars = { shortURL, longURL };
+  res.render("urls_show", templateVars);
+});
+
+// app.get("/", (req, res) => {
+//   res.send("Hello!");
+// });
+
+// // Adding routes
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
+
+// // Sending HTML
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

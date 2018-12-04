@@ -7,7 +7,7 @@
     <!-- Add your EJS code here -->
   <ul>
     <% for (let key in urls) { %>
-      <li><%= urls[key] %> - <b><%= key %></b></li>
+      <li><b><%= key %></b> - <%= urls[key] %></li>
     <%}%>
     <li><a href='#'>Add new link...</a></li>
   </ul>
