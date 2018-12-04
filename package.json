@@ -4,9 +4,10 @@
   "description": "",
   "main": "express_server.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "start": "./node_modules/.bin/nodemon -L express_server.js"
   },
-  "author": "Zixia Lu",
+  "author": "Zixia Lu <zixialu@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
