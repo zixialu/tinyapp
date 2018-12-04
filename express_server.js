@@ -29,9 +29,10 @@ app.post('/urls', (req, res) => {
   while (urlDatabase[shortURL]) {
     shortURL = generateRandomString();
   }
-
-  // Add new url to DB
   urlDatabase[shortURL] = req.body.longURL;
+
+  let templateVars = { urls: urlDatabase };
+  res.render('urls_index', templateVars);
 })
 
 // New url form
@@ -71,7 +72,7 @@ function generateRandomString() {
   const LEGAL_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const randomAlphanumerics = [];
   for (let i = 0; i < SHORT_URL_LENGTH; i++) {
-    const random = Math.floor(Math.random(LEGAL_CHARACTERS.length()));
+    const random = Math.floor(Math.random() * LEGAL_CHARACTERS.length);
     randomAlphanumerics.push(LEGAL_CHARACTERS[random]);
   }
   return randomAlphanumerics.join('');
