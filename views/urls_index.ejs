@@ -5,20 +5,22 @@
 </head>
 <body>
   <ul>
-    <table style='widht:100%;'>
+    <table>
       <% for (let key in urls) { %>
         <tr>
-          <td><b><%= key %></b> - <%= urls[key] %></td>
-          <td><a href='/urls/<%= key%>' style='margin:20px;'>Edit</a></td>
+          <td style='width:15%;'><b><%= key %></b></td>
+          <td>→</td>
+          <td><%= urls[key] %></td>
+          <td><a href='/urls/<%= key%>'>Edit</a></td>
           <td>
-            <form action='<%= `/urls/${key}/delete` %>' method='POST' style='display:inline; margin:20px'>
+            <form action='<%= `/urls/${key}/delete` %>' method='POST' style='display:inline;'>
               <input type='submit' value='Delete'>
             </form>
           </td>
         </tr>
       <%}%>
       <tr>
-        <td><a href='/urls/new'>Add new link...</a></td>
+        <td colspan='5'><a href='/urls/new'>Add new link...</a></td>
       </tr>
     </table>
   </ul>
