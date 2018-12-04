@@ -6,7 +6,12 @@
 <body>
   <ul>
     <% for (let key in urls) { %>
-      <li><b><%= key %></b> - <%= urls[key] %></li>
+      <li>
+        <b><%= key %></b> - <%= urls[key] %>
+        <form action='<%= `/urls/${key}/delete` %>' method='POST' style='display:inline; margin:20px'>
+          <input type='submit' value='Delete'>
+        </form>
+      </li>
     <%}%>
     <li><a href='/urls/new'>Add new link...</a></li>
   </ul>
