@@ -23,8 +23,15 @@ app.get('/urls', (req, res) => {
 // POST new url form
 app.post('/urls', (req, res) => {
   console.log(req.body);
-  // TODO: Implement actual behaviour
-  res.send('Ok');
+  let shortURL = generateRandomString();
+
+  // Ensure new shortURL is unique
+  while (urlDatabase[shortURL]) {
+    shortURL = generateRandomString();
+  }
+
+  // Add new url to DB
+  urlDatabase[shortURL] = req.body.longURL;
 })
 
 // New url form
