@@ -48,6 +48,12 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+// Redirect to longURL
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
+
 // app.get("/", (req, res) => {
 //   res.send("Hello!");
 // });
