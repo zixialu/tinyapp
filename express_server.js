@@ -31,8 +31,8 @@ app.post('/urls', (req, res) => {
   }
   urlDatabase[shortURL] = req.body.longURL;
 
-  let templateVars = { urls: urlDatabase };
-  res.render('urls_index', templateVars);
+  // Send a 303 redirect to /urls/<shortURL>
+  res.redirect(303, `/urls/${shortURL}`);
 })
 
 // New url form
