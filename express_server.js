@@ -22,7 +22,6 @@ app.get('/urls', (req, res) => {
 
 // POST new url form
 app.post('/urls', (req, res) => {
-  console.log(req.body);
   let shortURL = generateRandomString();
 
   // Ensure new shortURL is unique
@@ -46,6 +45,11 @@ app.get('/urls/:id', (req, res) => {
   const longURL = urlDatabase[shortURL];
   let templateVars = { shortURL, longURL };
   res.render('urls_show', templateVars);
+});
+
+app.post('/urls/:id', (req, res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect(303, '/urls');
 });
 
 // Delete url
