@@ -57,3 +57,15 @@ app.get('/urls/:id', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+// Generate a string to assign as a new shortURL
+function generateRandomString() {
+  const SHORT_URL_LENGTH = 6;
+  const LEGAL_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const randomAlphanumerics = [];
+  for (let i = 0; i < SHORT_URL_LENGTH; i++) {
+    const random = Math.floor(Math.random(LEGAL_CHARACTERS.length()));
+    randomAlphanumerics.push(LEGAL_CHARACTERS[random]);
+  }
+  return randomAlphanumerics.join('');
+}
