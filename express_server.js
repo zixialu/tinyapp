@@ -207,8 +207,6 @@ app.post('/register', (req, res) => {
     hashedPassword: bcrypt.hashSync(req.body.password, SALT_ROUNDS)
   };
 
-  console.log(users[id].hashedPassword);
-
   // Set cookie
   res.cookie('user_id', id);
 
