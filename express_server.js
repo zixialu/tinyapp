@@ -109,22 +109,23 @@ app.get('/urls/:id', (req, res) => {
 // Update url
 app.put('/urls/:id', (req, res) => {
   // Check if user has credentials to edit
-  if (urlDatabase[req.params.id].userId !== req.cookie['user_id']) {
+  if (urlDatabase[req.params.id].userId !== req.cookies['user_id']) {
     res.status(401).send('401: You must be the owner of the url to edit it');
+  } else {
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+    res.redirect(303, '/urls');
   }
-  urlDatabase[req.params.id] = req.body.longURL;
-  res.redirect(303, '/urls');
 });
 
 // Delete url
 app.delete('/urls/:id/delete', (req, res) => {
   // Check if user has credentials to delete
-  if (urlDatabase[req.params.id].userId !== req.cookie['user_id']) {
+  if (urlDatabase[req.params.id].userId !== req.cookies['user_id']) {
     res.status(401).send('401: You must be the owner of the url to delete it');
+  } else {
+    delete urlDatabase[req.params.id];
+    res.redirect(303, `/urls`);
   }
-  delete urlDatabase[req.params.id];
-  // Send a 303 redirect to /urls
-  res.redirect(303, `/urls`);
 });
 
 
