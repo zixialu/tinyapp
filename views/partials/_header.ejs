@@ -1,12 +1,12 @@
 <h1>tinyApp</h1>
-<% if (!username) { %>
-  <form action='/login' method='POST' style='display:inline; margin:20px'>
-    <input id='username' type="text" name='username' placeholder='Username' style="width: 300px">
+<% if (!user) { %>
+  <form action='/login' method='POST' style='display:inline; margin:20px;'>
+    <input id='user_id' type="text" name='user_id' placeholder='user_id' style="width: 300px">
     <input type='submit' value='Login'>
   </form>
 <% } else { %>
-  <form action='/logout' method='POST' style='display:inline; margin:20px'>
-    <b><%= username %></b>
+  <form action='/logout' method='POST' style='display:inline; margin:20px;'>
+    <b><%= user.email %></b>
     <input type='submit' value='Logout'>
   </form>
 <% } %>
