@@ -13,10 +13,28 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(methodOverride('_method'));
 
+
+// MARK: - Data
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
+
+// MARK: - Endpoints
 
 // Generate a string to assign as a new shortURL
 function generateRandomString() {
@@ -34,7 +52,7 @@ function generateRandomString() {
 app.get('/urls', (req, res) => {
   // cookieParser()
   console.log(req.cookies);
-  let templateVars = { urls: urlDatabase, username: req.cookies['username']};
+  const templateVars = { urls: urlDatabase, username: req.cookies['username']};
   res.render('urls_index', templateVars);
 });
 
@@ -54,7 +72,7 @@ app.post('/urls', (req, res) => {
 
 // New url form
 app.get('/urls/new', (req, res) => {
-  let templateVars = { username: req.cookies['username'] };
+  const templateVars = { username: req.cookies['username'] };
   res.render('urls_new', templateVars);
 });
 
@@ -62,7 +80,7 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
-  let templateVars = { shortURL, longURL, username: req.cookies['username'] };
+  const templateVars = { shortURL, longURL, username: req.cookies['username'] };
   res.render('urls_show', templateVars);
 });
 
@@ -79,9 +97,12 @@ app.delete('/urls/:id/delete', (req, res) => {
   res.redirect(303, `/urls`);
 });
 
+
+// MARK: - Authentication
+
 // Redirect to longURL
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
@@ -96,6 +117,14 @@ app.post('/logout', (req, res) => {
   res.clearCookie('username');
   res.redirect(303, '/urls');
 });
+
+// Register account form
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+
+//MARK: - Ports
 
 // Listening for requests
 app.listen(PORT, () => {
