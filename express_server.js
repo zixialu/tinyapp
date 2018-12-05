@@ -17,7 +17,7 @@ const urlDatabase = {
 
 // Url list
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase, username: req.cookies['username'] };
   res.render('urls_index', templateVars);
 });
 
@@ -37,14 +37,15 @@ app.post('/urls', (req, res) => {
 
 // New url form
 app.get('/urls/new', (req, res) => {
-  res.render('urls_new');
+  let templateVars = { username: req.cookies['username'] };
+  res.render('urls_new', templateVars);
 });
 
 // View single url
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
-  let templateVars = { shortURL, longURL };
+  let templateVars = { shortURL, longURL, username: req.cookies['username'] };
   res.render('urls_show', templateVars);
 });
 
