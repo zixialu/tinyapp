@@ -88,6 +88,9 @@ app.post('/urls', (req, res) => {
 
 // New url form
 app.get('/urls/new', (req, res) => {
+  // Redirect guests to login form
+  if (!req.cookies['user_id']) { res.redirect('/login'); }
+
   const templateVars = { user: users[req.cookies['user_id']] };
   res.render('urls_new', templateVars);
 });
