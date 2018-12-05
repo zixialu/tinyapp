@@ -120,7 +120,8 @@ app.post('/logout', (req, res) => {
 
 // Register user form
 app.get('/register', (req, res) => {
-  res.render('register');
+  const templateVars = { username: req.cookies['username'] };
+  res.render('register', templateVars);
 });
 
 // POST user registration
