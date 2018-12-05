@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const methodOverride = require('method-override');
 const app = express();
 const PORT = 8080;
 
@@ -10,6 +11,7 @@ app.set('view engine', 'ejs');
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(methodOverride('_method'));
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -65,15 +67,13 @@ app.get('/urls/:id', (req, res) => {
 });
 
 // Update url
-// TODO: CHange this to use PUT and not POST
-app.post('/urls/:id', (req, res) => {
+app.put('/urls/:id', (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect(303, '/urls');
 });
 
 // Delete url
-// TODO: Change this to use DELETE and not POST
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id/delete', (req, res) => {
   delete urlDatabase[req.params.id];
   // Send a 303 redirect to /urls
   res.redirect(303, `/urls`);

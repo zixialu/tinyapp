@@ -13,7 +13,7 @@
           <td><%= urls[key] %></td>
           <td><a href='/urls/<%= key%>'>Edit</a></td>
           <td>
-            <form action='<%= `/urls/${key}/delete` %>' method='POST' style='display:inline;'>
+            <form action='<%= `/urls/${key}/delete?_method=DELETE` %>' method='POST' style='display:inline;'>
               <input type='submit' value='Delete'>
             </form>
           </td>
