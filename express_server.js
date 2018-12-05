@@ -7,8 +7,9 @@ const PORT = 8080; // default port 8080
 // Set view engine to ejs
 app.set('view engine', 'ejs');
 
-// Set body parsing
+// Set body parsing, cookies
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -17,7 +18,9 @@ const urlDatabase = {
 
 // Url list
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies['username'] };
+  // cookieParser()
+  console.log(req.cookies);
+  let templateVars = { urls: urlDatabase, username: req.cookies['username']};
   res.render('urls_index', templateVars);
 });
 
