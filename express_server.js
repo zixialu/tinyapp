@@ -2,8 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
+const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8080;
+const SALT_ROUNDS = 10;
 
 // Set view engine to ejs
 app.set('view engine', 'ejs');
@@ -24,17 +26,17 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "aaa"
+    hashedPassword: bcrypt.hashSync("aaa", SALT_ROUNDS)
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    hashedPassword: bcrypt.hashSync("dishwasher-funk", SALT_ROUNDS)
   },
   "444444": {
     id: "444444",
     email: "zixialu@gmail.com",
-    password: "hunter2"
+    hashedPassword: bcrypt.hashSync("hunter2", SALT_ROUNDS)
   }
 };
 
@@ -165,12 +167,12 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const userMatch = getUserWithEmail(req.body.email);
   // Handle bad credentials
-  if (!userMatch || userMatch.password !== req.body.password) {
+  if (!userMatch || !bcrypt.compareSync(req.body.password, userMatch.hashedPassword)) {
     res.status(401).send('401: The email or password you have entered is incorrect');
+  } else {
+    res.cookie('user_id', userMatch.id);
+    res.redirect(303, '/urls');
   }
-
-  res.cookie('user_id', userMatch.id);
-  res.redirect(303, '/urls');
 });
 
 // Logout
@@ -202,8 +204,10 @@ app.post('/register', (req, res) => {
   users[id] = {
     id,
     email: req.body.email,
-    password: req.body.password
+    hashedPassword: bcrypt.hashSync(req.body.password, SALT_ROUNDS)
   };
+
+  console.log(users[id].hashedPassword);
 
   // Set cookie
   res.cookie('user_id', id);
