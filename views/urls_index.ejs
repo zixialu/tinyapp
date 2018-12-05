@@ -10,7 +10,7 @@
         <tr>
           <td style='width:15%;'><b><%= key %></b></td>
           <td>→</td>
-          <td><%= urls[key] %></td>
+          <td><%= urls[key].longURL %></td>
           <td><a href='/urls/<%= key%>'>Edit</a></td>
           <td>
             <form action='<%= `/urls/${key}/delete?_method=DELETE` %>' method='POST' style='display:inline;'>

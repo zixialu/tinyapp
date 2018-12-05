@@ -55,8 +55,8 @@ function generateRandomString() {
 
 // Returns the user with an email, or null if email can't be found
 function getUserWithEmail(email) {
-  for (userID in users) {
-    if (users[userID].email.toLowerCase() === email) { return users[userID]; }
+  for (userId in users) {
+    if (users[userId].email.toLowerCase() === email) { return users[userId]; }
   }
   return null;
 }
@@ -82,7 +82,7 @@ app.post('/urls', (req, res) => {
   }
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userID: req.cookies['user_id']
+    userId: req.cookies['user_id']
   };
 
   // Send a 303 redirect to /urls/<shortURL>
@@ -101,19 +101,27 @@ app.get('/urls/new', (req, res) => {
 // View single url
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL].longURL;
   const templateVars = { shortURL, longURL, user: users[req.cookies['user_id']] };
   res.render('urls_show', templateVars);
 });
 
 // Update url
 app.put('/urls/:id', (req, res) => {
+  // Check if user has credentials to edit
+  if (urlDatabase[req.params.id].userId !== req.cookie['user_id']) {
+    res.status(401).send('401: You must be the owner of the url to edit it');
+  }
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect(303, '/urls');
 });
 
 // Delete url
 app.delete('/urls/:id/delete', (req, res) => {
+  // Check if user has credentials to delete
+  if (urlDatabase[req.params.id].userId !== req.cookie['user_id']) {
+    res.status(401).send('401: You must be the owner of the url to delete it');
+  }
   delete urlDatabase[req.params.id];
   // Send a 303 redirect to /urls
   res.redirect(303, `/urls`);
@@ -124,7 +132,7 @@ app.delete('/urls/:id/delete', (req, res) => {
 
 // Redirect to longURL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -139,7 +147,7 @@ app.post('/login', (req, res) => {
   const userMatch = getUserWithEmail(req.body.email);
   // Handle bad credentials
   if (!userMatch || userMatch.password !== req.body.password) {
-    res.status(400).send('400: The email or password you have entered is incorrect');
+    res.status(401).send('401: The email or password you have entered is incorrect');
   }
 
   res.cookie('user_id', userMatch.id);
@@ -169,7 +177,7 @@ app.post('/register', (req, res) => {
 
   // Handle bad input (empty fields, email exists)
   if (!email || !password) { res.status(400).send('400: Bad request'); }
-  if (getUserWithEmail(email)) { res.status(400).send('400: Bad request'); }
+  if (getUserWithEmail(email)) { res.status(409).send('409: email is taken'); }
 
   // Add new user to 'db'
   users[id] = {
