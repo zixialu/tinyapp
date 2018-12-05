@@ -117,6 +117,12 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+// Login form
+app.get('/login', (req, res) => {
+  const templateVars = { user: users[req.cookies['user_id']] };
+  res.render('login', templateVars);
+});
+
 // Login
 app.post('/login', (req, res) => {
   const userMatch = getUserWithEmail(req.body.email);
@@ -125,7 +131,7 @@ app.post('/login', (req, res) => {
     res.status(400).send('400: The email or password you have entered is incorrect');
   }
 
-  res.cookie('user_id', req.body.user_id);
+  res.cookie('user_id', userMatch.user_id);
   res.redirect(303, '/urls');
 });
 
