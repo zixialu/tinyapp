@@ -31,8 +31,8 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk"
   },
-  "000000": {
-    id: "000000",
+  "444444": {
+    id: "444444",
     email: "zixialu@gmail.com",
     password: "hunter2"
   }
@@ -136,7 +136,7 @@ app.post('/login', (req, res) => {
     res.status(400).send('400: The email or password you have entered is incorrect');
   }
 
-  res.cookie('user_id', userMatch.user_id);
+  res.cookie('user_id', userMatch.id);
   res.redirect(303, '/urls');
 });
 
