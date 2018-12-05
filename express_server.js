@@ -103,18 +103,25 @@ app.post('/urls', (req, res) => {
 // New url form
 app.get('/urls/new', (req, res) => {
   // Redirect guests to login form
-  if (!req.cookies['user_id']) { res.redirect('/login'); }
+  if (!req.cookies['user_id']) {
+    res.redirect('/login');
+  } else {
+    const templateVars = { user: users[req.cookies['user_id']] };
+    res.render('urls_new', templateVars);
+  }
 
-  const templateVars = { user: users[req.cookies['user_id']] };
-  res.render('urls_new', templateVars);
 });
 
 // View single url
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL].longURL;
-  const templateVars = { shortURL, longURL, user: users[req.cookies['user_id']] };
-  res.render('urls_show', templateVars);
+  if (urlDatabase[shortURL].userId === req.cookies['user_id']) {
+    const longURL = urlDatabase[shortURL].longURL;
+    const templateVars = { shortURL, longURL, user: users[req.cookies['user_id']] };
+    res.render('urls_show', templateVars);
+  } else {
+    res.status(401).send('401: You must be the owner of the url to edit it');
+  }
 });
 
 // Update url
