@@ -64,6 +64,8 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+// Update url
+// TODO: CHange this to use PUT and not POST
 app.post('/urls/:id', (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect(303, '/urls');
