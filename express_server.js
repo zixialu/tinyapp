@@ -34,7 +34,7 @@ const users = {
 };
 
 
-// MARK: - Endpoints
+// MARK: - Helpers
 
 // Generate a string to assign as a new shortURL
 function generateRandomString() {
@@ -47,6 +47,17 @@ function generateRandomString() {
   }
   return randomAlphanumerics.join('');
 }
+
+// Returns the user with an email, or null if email can't be found
+function getUserWithEmail(email) {
+  for (userId in users) {
+    if (users[userId].email.toLowerCase() === email) { return users[userId]; }
+  }
+  return null;
+}
+
+
+// MARK: - Endpoints
 
 // Url list
 app.get('/urls', (req, res) => {
@@ -108,6 +119,12 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Login
 app.post('/login', (req, res) => {
+  const userMatch = getUserWithEmail(req.body.email);
+  // Handle bad credentials
+  if (!userMatch || userMatch.password !== req.body.password) {
+    res.status(400).send('400: The email or password you have entered is incorrect');
+  }
+
   res.cookie('user_id', req.body.user_id);
   res.redirect(303, '/urls');
 });
@@ -133,11 +150,9 @@ app.post('/register', (req, res) => {
   }
   const { email, password } = req.body;
 
-  // Handle bad input
+  // Handle bad input (empty fields, email exists)
   if (!email || !password) { res.status(400).send('400: Bad request'); }
-  for (userId in users) {
-    if (users[userId].email.toLowerCase() === email) { res.status(400).send('400: Bad request'); }
-  }
+  if (getUserWithEmail(email)) { res.status(400).send('400: Bad request'); }
 
   // Add new user to 'db'
   users[id] = {
