@@ -16,8 +16,8 @@ app.use(methodOverride('_method'));
 
 // MARK: - Data
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca" },
+  "9sm5xK": { longURL: "http://www.google.com" }
 };
 
 const users = {
@@ -55,8 +55,8 @@ function generateRandomString() {
 
 // Returns the user with an email, or null if email can't be found
 function getUserWithEmail(email) {
-  for (userId in users) {
-    if (users[userId].email.toLowerCase() === email) { return users[userId]; }
+  for (userID in users) {
+    if (users[userID].email.toLowerCase() === email) { return users[userID]; }
   }
   return null;
 }
@@ -80,7 +80,10 @@ app.post('/urls', (req, res) => {
   while (urlDatabase[shortURL]) {
     shortURL = generateRandomString();
   }
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: req.cookies['user_id']
+  };
 
   // Send a 303 redirect to /urls/<shortURL>
   res.redirect(303, `/urls/${shortURL}`);
