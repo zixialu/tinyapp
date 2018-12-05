@@ -126,17 +126,28 @@ app.get('/register', (req, res) => {
 
 // POST user registration
 app.post('/register', (req, res) => {
+  // Generate new random id, ensure new id is unique
   let id = generateRandomString();
-
-  // Ensure new id is unique
   while (users[id]) {
     id = generateRandomString();
   }
+  const { email, password } = req.body;
+
+  // Handle bad input
+  if (!email || !password) { res.status(400).send('400: Bad request'); }
+  for (userId in users) {
+    if (users[userId].email.toLowerCase() === email) { res.status(400).send('400: Bad request'); }
+  }
+
+  // Add new user to 'db'
   users[id] = {
     id,
     email: req.body.email,
     password: req.body.password
   };
+
+  // Set cookie
+  res.cookie('user_id', id);
 
   res.redirect(303, '/urls');
 });
@@ -146,5 +157,5 @@ app.post('/register', (req, res) => {
 
 // Listening for requests
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`tinyApp listening on port ${PORT}!`);
 });
