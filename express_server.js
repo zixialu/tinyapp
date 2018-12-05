@@ -16,15 +16,15 @@ app.use(methodOverride('_method'));
 
 // MARK: - Data
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca" },
-  "9sm5xK": { longURL: "http://www.google.com" }
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: "userRandomID" },
+  "9sm5xK": { longURL: "http://www.google.com", userId: "userRandomID" }
 };
 
 const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "aaa"
   },
   "user2RandomID": {
     id: "user2RandomID",
@@ -61,14 +61,25 @@ function getUserWithEmail(email) {
   return null;
 }
 
+// Returns the urls created by a user
+function getUsersURLs(userId) {
+  let usersUrls = {};
+  for (shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userId === userId) {
+      usersUrls[shortURL] = urlDatabase[shortURL];
+    }
+  }
+
+  return usersUrls;
+}
+
 
 // MARK: - Endpoints
 
 // Url list
 app.get('/urls', (req, res) => {
-  // cookieParser()
-  console.log(req.cookies);
-  const templateVars = { urls: urlDatabase, user: users[req.cookies['user_id']] };
+  const userId = req.cookies['user_id'];
+  const templateVars = { urls: getUsersURLs(userId), user: users[userId] };
   res.render('urls_index', templateVars);
 });
 
