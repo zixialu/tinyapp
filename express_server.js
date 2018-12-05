@@ -118,9 +118,26 @@ app.post('/logout', (req, res) => {
   res.redirect(303, '/urls');
 });
 
-// Register account form
+// Register user form
 app.get('/register', (req, res) => {
   res.render('register');
+});
+
+// POST user registration
+app.post('/register', (req, res) => {
+  let id = generateRandomString();
+
+  // Ensure new id is unique
+  while (users[id]) {
+    id = generateRandomString();
+  }
+  users[id] = {
+    id,
+    email: req.body.email,
+    password: req.body.password
+  };
+
+  res.redirect(303, '/urls');
 });
 
 
