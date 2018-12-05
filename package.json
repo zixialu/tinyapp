@@ -16,6 +16,8 @@
     "express": "^4.16.4"
   },
   "devDependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-lighthouselabs": "github:lighthouse-labs/eslint-config-lighthouselabs",
     "nodemon": "^1.18.7"
   }
 }

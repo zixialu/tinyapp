@@ -7,7 +7,7 @@ const PORT = 8080; // default port 8080
 // Set view engine to ejs
 app.set('view engine', 'ejs');
 
-// Set body parsing, cookies
+// Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
