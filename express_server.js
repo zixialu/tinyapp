@@ -35,14 +35,14 @@ const urlDatabase = {
   'b2xVn2': {
     longURL: 'http://www.lighthouselabs.ca',
     userId: 'userRandomID',
-    dateCreated: new Date(0),
+    dateCreated: new Date(),
     visits: 0,
     uniqueVisits: 0
   },
   '9sm5xK': {
     longURL: 'http://www.google.com',
     userId: 'userRandomID',
-    dateCreated: new Date(0),
+    dateCreated: new Date(),
     visits: 0,
     uniqueVisits: 0
   }
