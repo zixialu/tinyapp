@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const methodOverride = require('method-override');
 const bcrypt = require('bcrypt');
+const dateFormat = require('dateformat');
 require('dotenv').config();
 const app = express();
 const PORT = 8080;
@@ -31,8 +32,20 @@ app.use(methodOverride('_method'));
 
 // MARK: - Data
 const urlDatabase = {
-  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', userId: 'userRandomID' },
-  '9sm5xK': { longURL: 'http://www.google.com', userId: 'userRandomID' }
+  'b2xVn2': {
+    longURL: 'http://www.lighthouselabs.ca',
+    userId: 'userRandomID',
+    dateCreated: new Date(0),
+    visits: 0,
+    uniqueVisits: 0
+  },
+  '9sm5xK': {
+    longURL: 'http://www.google.com',
+    userId: 'userRandomID',
+    dateCreated: new Date(0),
+    visits: 0,
+    uniqueVisits: 0
+  }
 };
 
 const users = {
@@ -108,7 +121,12 @@ app.get('/urls', (req, res) => {
     // Guests cannot access this page
     res.status(401).send('401: You must be logged in to view urls');
   } else {
-    const templateVars = { urls: getUsersURLs(userId), user: users[userId] };
+    const formattedDate = dateFormat(users[userId].dateCreated, 'isoDate');
+    const templateVars = {
+      urls: getUsersURLs(userId),
+      user: users[userId],
+      formattedDate
+    };
     res.render('urls_index', templateVars);
   }
 });
@@ -127,7 +145,10 @@ app.post('/urls', (req, res) => {
     }
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
-      userId: req.session.userId
+      userId: req.session.userId,
+      dateCreated: new Date(),
+      visits: 0,
+      uniqueVisits: 0
     };
 
     // Send a 303 redirect to /urls/<shortURL>
@@ -136,7 +157,6 @@ app.post('/urls', (req, res) => {
 });
 
 // New url form
-// TODO: Implement dateCreated, visitsCounter, uniqueVisitsCounter
 app.get('/urls/new', (req, res) => {
   // Redirect guests to login form
   if (!req.session.userId) {
@@ -148,7 +168,7 @@ app.get('/urls/new', (req, res) => {
 });
 
 // View/edit single url
-// TODO: Implement dateCreated, visitsCounterm uniqueVisitsCounter
+// TODO: Implement dateCreated, visitsCounter, uniqueVisitsCounter
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
   if (!urlDatabase[shortURL]) {
@@ -197,6 +217,12 @@ app.get('/u/:shortURL', (req, res) => {
     // Handle invalid shortURL
     res.status(400).send('400: Bad request');
   } else {
+    // Increment visits
+    urlDatabase[req.params.shortURL].visits++;
+    // TODO: Implement increment unique visits
+    // Increment unique visits based on cookies
+
+    // Redirect to target
     res.redirect(longURL);
   }
 });
