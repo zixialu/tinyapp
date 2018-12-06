@@ -17,45 +17,46 @@ app.set('trust proxy', 1);
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieSession({
-  name: 'session',
-  keys: [process.env.COOKIE_SESSION_KEYS]
-}));
+app.use(
+  cookieSession({
+    name: 'session',
+    keys: [process.env.COOKIE_SESSION_KEYS]
+  })
+);
 console.log(process.env.COOKIE_SESSION_KEYS);
 app.use(methodOverride('_method'));
 
-
 // MARK: - Data
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: "userRandomID" },
-  "9sm5xK": { longURL: "http://www.google.com", userId: "userRandomID" }
+  b2xVn2: { longURL: 'http://www.lighthouselabs.ca', userId: 'userRandomID' },
+  '9sm5xK': { longURL: 'http://www.google.com', userId: 'userRandomID' }
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    hashedPassword: bcrypt.hashSync("aaa", SALT_ROUNDS)
+  userRandomID: {
+    id: 'userRandomID',
+    email: 'user@example.com',
+    hashedPassword: bcrypt.hashSync('aaa', SALT_ROUNDS)
   },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    hashedPassword: bcrypt.hashSync("dishwasher-funk", SALT_ROUNDS)
+  user2RandomID: {
+    id: 'user2RandomID',
+    email: 'user2@example.com',
+    hashedPassword: bcrypt.hashSync('dishwasher-funk', SALT_ROUNDS)
   },
-  "444444": {
-    id: "444444",
-    email: "zixialu@gmail.com",
-    hashedPassword: bcrypt.hashSync("hunter2", SALT_ROUNDS)
+  '444444': {
+    id: '444444',
+    email: 'zixialu@gmail.com',
+    hashedPassword: bcrypt.hashSync('hunter2', SALT_ROUNDS)
   }
 };
-
 
 // MARK: - Helpers
 
 // Generate a string to assign as a new shortURL
 function generateRandomString() {
   const SHORT_URL_LENGTH = 6;
-  const LEGAL_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const LEGAL_CHARACTERS =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const randomAlphanumerics = [];
   for (let i = 0; i < SHORT_URL_LENGTH; i++) {
     const random = Math.floor(Math.random() * LEGAL_CHARACTERS.length);
@@ -67,7 +68,9 @@ function generateRandomString() {
 // Returns the user with an email, or null if email can't be found
 function getUserWithEmail(email) {
   for (userId in users) {
-    if (users[userId].email.toLowerCase() === email) { return users[userId]; }
+    if (users[userId].email.toLowerCase() === email) {
+      return users[userId];
+    }
   }
   return null;
 }
@@ -83,7 +86,6 @@ function getUsersURLs(userId) {
 
   return usersUrls;
 }
-
 
 // MARK: - Endpoints
 
@@ -120,7 +122,6 @@ app.get('/urls/new', (req, res) => {
     const templateVars = { user: users[req.session.user_id] };
     res.render('urls_new', templateVars);
   }
-
 });
 
 // View single url
@@ -128,7 +129,11 @@ app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
   if (urlDatabase[shortURL].userId === req.session.user_id) {
     const longURL = urlDatabase[shortURL].longURL;
-    const templateVars = { shortURL, longURL, user: users[req.session.user_id] };
+    const templateVars = {
+      shortURL,
+      longURL,
+      user: users[req.session.user_id]
+    };
     res.render('urls_show', templateVars);
   } else {
     res.status(401).send('401: You must be the owner of the url to edit it');
@@ -157,11 +162,10 @@ app.delete('/urls/:id/delete', (req, res) => {
   }
 });
 
-
 // MARK: - Authentication
 
 // Redirect to longURL
-app.get("/u/:shortURL", (req, res) => {
+app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
@@ -176,8 +180,13 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const userMatch = getUserWithEmail(req.body.email);
   // Handle bad credentials
-  if (!userMatch || !bcrypt.compareSync(req.body.password, userMatch.hashedPassword)) {
-    res.status(401).send('401: The email or password you have entered is incorrect');
+  if (
+    !userMatch ||
+    !bcrypt.compareSync(req.body.password, userMatch.hashedPassword)
+  ) {
+    res
+      .status(401)
+      .send('401: The email or password you have entered is incorrect');
   } else {
     // FIXME: Refactor all instances of user_id into camel case
     req.session.user_id = userMatch.id;
@@ -208,8 +217,12 @@ app.post('/register', (req, res) => {
   const { email, password } = req.body;
 
   // Handle bad input (empty fields, email exists)
-  if (!email || !password) { res.status(400).send('400: Bad request'); }
-  if (getUserWithEmail(email)) { res.status(409).send('409: email is taken'); }
+  if (!email || !password) {
+    res.status(400).send('400: Bad request');
+  }
+  if (getUserWithEmail(email)) {
+    res.status(409).send('409: email is taken');
+  }
 
   // Add new user to 'db'
   users[id] = {
@@ -223,7 +236,6 @@ app.post('/register', (req, res) => {
 
   res.redirect(303, '/urls');
 });
-
 
 //MARK: - Ports
 
