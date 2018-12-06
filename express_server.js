@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 const app = express();
 const PORT = 8080;
+// Used to hash received passwords
 const SALT_ROUNDS = 10;
 
 // Set view engine to ejs
@@ -65,7 +66,7 @@ function generateRandomString() {
   return randomAlphanumerics.join('');
 }
 
-// Returns the user with an email, or null if email can't be found
+// Returns the user given an email, or null if email can't be found
 function getUserWithEmail(email) {
   for (userId in users) {
     if (users[userId].email.toLowerCase() === email) {
@@ -124,7 +125,7 @@ app.get('/urls/new', (req, res) => {
   }
 });
 
-// View single url
+// View/edit single url
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
   if (urlDatabase[shortURL].userId === req.session.userId) {
@@ -162,13 +163,13 @@ app.delete('/urls/:id/delete', (req, res) => {
   }
 });
 
-// MARK: - Authentication
-
 // Redirect to longURL
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
+
+// MARK: - Authentication
 
 // Login form
 app.get('/login', (req, res) => {
