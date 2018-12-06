@@ -104,8 +104,13 @@ app.get('/', (req, res) => {
 // Url list
 app.get('/urls', (req, res) => {
   const userId = req.session.userId;
-  const templateVars = { urls: getUsersURLs(userId), user: users[userId] };
-  res.render('urls_index', templateVars);
+  if (!userId) {
+    // Guests cannot access this page
+    res.status(401).send('401: You must be logged in to view urls');
+  } else {
+    const templateVars = { urls: getUsersURLs(userId), user: users[userId] };
+    res.render('urls_index', templateVars);
+  }
 });
 
 // POST new url form data
