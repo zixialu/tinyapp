@@ -189,7 +189,12 @@ app.delete('/urls/:id/delete', (req, res) => {
 // TODO: Handle shortURL does not exist > error message
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  if (!longURL) {
+    // Handle invalid shortURL
+    res.status(400).send('400: Bad request');
+  } else {
+    res.redirect(longURL);
+  }
 });
 
 // MARK: - Authentication
