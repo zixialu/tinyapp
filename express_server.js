@@ -145,10 +145,13 @@ app.get('/urls/new', (req, res) => {
 
 // View/edit single url
 // TODO: Implement dateCreated, visitsCounterm uniqueVisitsCounter
-// TODO: Handle invalid shortURL > error message
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
-  if (urlDatabase[shortURL].userId === req.session.userId) {
+  if (!urlDatabase[shortURL]) {
+    // Handle invalid shortURL
+    res.status(400).send('400: Bad request');
+    // Check that the user owns the link
+  } else if (urlDatabase[shortURL].userId === req.session.userId) {
     const longURL = urlDatabase[shortURL].longURL;
     const templateVars = {
       shortURL,
@@ -162,7 +165,6 @@ app.get('/urls/:id', (req, res) => {
 });
 
 // Update url
-// TODO: Check that guests will get the 401 message
 app.put('/urls/:id', (req, res) => {
   // Check if user has credentials to edit
   if (urlDatabase[req.params.id].userId !== req.session.userId) {
@@ -174,7 +176,6 @@ app.put('/urls/:id', (req, res) => {
 });
 
 // Delete url
-// TODO: Check that guests will get the 401 message
 app.delete('/urls/:id/delete', (req, res) => {
   // Check if user has credentials to delete
   if (urlDatabase[req.params.id].userId !== req.session.userId) {
@@ -186,7 +187,6 @@ app.delete('/urls/:id/delete', (req, res) => {
 });
 
 // Redirect to longURL
-// TODO: Handle shortURL does not exist > error message
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   if (!longURL) {
