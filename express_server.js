@@ -20,7 +20,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cookieSession({
     name: 'session',
-    keys: [process.env.COOKIE_SESSION_KEYS]
+    keys: [process.env.COOKIE_SESSION_KEYS],
+
+    // Cookie Options
+    // Persist cookie for 24 hours
+    maxAge: 24 * 60 * 60 * 1000
   })
 );
 app.use(methodOverride('_method'));
@@ -86,6 +90,17 @@ function getUsersURLs(userId) {
 
 // MARK: - Endpoints
 
+// Redirect from root
+app.get('/', (req, res) => {
+  if (req.session.userId) {
+    // User is logged in, show /urls
+    res.redirect('/urls');
+  } else {
+    // User must log in first
+    res.redirect('/login');
+  }
+});
+
 // Url list
 app.get('/urls', (req, res) => {
   const userId = req.session.userId;
@@ -111,6 +126,7 @@ app.post('/urls', (req, res) => {
 });
 
 // New url form
+// TODO: Implement dateCreated, visitsCounter, uniqueVisitsCounter
 app.get('/urls/new', (req, res) => {
   // Redirect guests to login form
   if (!req.session.userId) {
