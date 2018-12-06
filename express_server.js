@@ -232,7 +232,6 @@ app.get('/u/:shortURL', (req, res) => {
       req.session[visitCookieKey] = true;
       urlDatabase[req.params.shortURL].uniqueVisits++;
     }
-    console.log(req.session);
     // Redirect to target
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
