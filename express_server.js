@@ -114,21 +114,25 @@ app.get('/urls', (req, res) => {
 });
 
 // POST new url form data
-// TODO: Handle user not logged in > error message
 app.post('/urls', (req, res) => {
-  let shortURL = generateRandomString();
+  if (!req.session.userId) {
+    // Handle user not logged in
+    res.status(401).send('401: You must be logged in to shorten a url');
+  } else {
+    let shortURL = generateRandomString();
 
-  // Ensure new shortURL is unique
-  while (urlDatabase[shortURL]) {
-    shortURL = generateRandomString();
+    // Ensure new shortURL is unique
+    while (urlDatabase[shortURL]) {
+      shortURL = generateRandomString();
+    }
+    urlDatabase[shortURL] = {
+      longURL: req.body.longURL,
+      userId: req.session.userId
+    };
+
+    // Send a 303 redirect to /urls/<shortURL>
+    res.redirect(303, `/urls/${shortURL}`);
   }
-  urlDatabase[shortURL] = {
-    longURL: req.body.longURL,
-    userId: req.session.userId
-  };
-
-  // Send a 303 redirect to /urls/<shortURL>
-  res.redirect(303, `/urls/${shortURL}`);
 });
 
 // New url form
