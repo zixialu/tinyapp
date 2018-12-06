@@ -11,7 +11,7 @@
           <td><b><%= key %></b></td>
           <td>→</td>
           <td><%= urls[key].longURL %></td>
-          <td>Visits: <%= urls[key].visits %> (Unique: <%= urls[key].uniqueVisits %>)</td>
+          <td>Visits: <%= urls[key].visits %> (<%= urls[key].uniqueVisits %> unique)</td>
           <td>Created: <%= formattedDate %></td>
           <td><a href='/urls/<%= key%>'>Edit</a></td>
           <td>

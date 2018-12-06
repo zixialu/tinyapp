@@ -221,7 +221,13 @@ app.get('/u/:shortURL', (req, res) => {
     urlDatabase[req.params.shortURL].visits++;
     // TODO: Implement increment unique visits
     // Increment unique visits based on cookies
-
+    // Could be accomplished in other ways, such as by tracking fingerprints
+    const visitCookieKey = 'visit' + req.params.shortURL;
+    if (!req.session[visitCookieKey]) {
+      // User has not visitied this shortURL before; count it as a unique visit
+      req.session[visitCookieKey] = true;
+      urlDatabase[req.params.shortURL].uniqueVisits++;
+    }
     // Redirect to target
     res.redirect(longURL);
   }
