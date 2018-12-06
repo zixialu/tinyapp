@@ -6,7 +6,7 @@ Week 2 Project for Lighthouse Labs
 
 TinyApp is a (nearly) full-stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
 
-## Final Product
+## Product Screenshots
 
 ![Screenshot of urls page](https://github.com/zixialu/tinyapp/blob/master/docs/urls-page.png?raw=true)
 ![Screenshot of urls/:id page](https://github.com/zixialu/tinyapp/blob/master/docs/urls-show-page.png?raw=true)
@@ -34,6 +34,8 @@ TinyApp is a (nearly) full-stack web application built with Node and Express tha
    ```
 
 3. Start TinyApp with the command `node express-server.js`. TinyApp listens on **port 8080** by default.
+
+4. With the six-character short URLs from `/urls`, access its corresponding link from `/u/<SHORT_URL>`.
 
 ## Project Goal
 
