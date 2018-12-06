@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cookieSession({
     name: 'session',
-    keys: [process.env.COOKIE_SESSION_KEYS],
+    keys: [process.env.COOKIE_SESSION_KEY],
 
     // Cookie Options
     // Persist cookie for 24 hours
