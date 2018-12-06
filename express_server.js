@@ -114,6 +114,7 @@ app.get('/urls', (req, res) => {
 });
 
 // POST new url form data
+// TODO: Handle user not logged in > error message
 app.post('/urls', (req, res) => {
   let shortURL = generateRandomString();
 
@@ -143,6 +144,8 @@ app.get('/urls/new', (req, res) => {
 });
 
 // View/edit single url
+// TODO: Implement dateCreated, visitsCounterm uniqueVisitsCounter
+// TODO: Handle invalid shortURL > error message
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
   if (urlDatabase[shortURL].userId === req.session.userId) {
@@ -159,6 +162,7 @@ app.get('/urls/:id', (req, res) => {
 });
 
 // Update url
+// TODO: Check that guests will get the 401 message
 app.put('/urls/:id', (req, res) => {
   // Check if user has credentials to edit
   if (urlDatabase[req.params.id].userId !== req.session.userId) {
@@ -170,6 +174,7 @@ app.put('/urls/:id', (req, res) => {
 });
 
 // Delete url
+// TODO: Check that guests will get the 401 message
 app.delete('/urls/:id/delete', (req, res) => {
   // Check if user has credentials to delete
   if (urlDatabase[req.params.id].userId !== req.session.userId) {
@@ -181,6 +186,7 @@ app.delete('/urls/:id/delete', (req, res) => {
 });
 
 // Redirect to longURL
+// TODO: Handle shortURL does not exist > error message
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
@@ -189,6 +195,7 @@ app.get('/u/:shortURL', (req, res) => {
 // MARK: - Authentication
 
 // Login form
+// TODO: Redirect logged-in users to /urls
 app.get('/login', (req, res) => {
   const templateVars = { user: users[req.session.userId] };
   res.render('login', templateVars);
@@ -215,11 +222,18 @@ app.post('/login', (req, res) => {
 
 // Logout
 app.post('/logout', (req, res) => {
+  // Delete cookie
   req.session = null;
+  /*
+   * FIXME: Requirements state logout should redirect to /urls, but accessing
+   * /urls while logged out will redirect to a 401 error page. Should this be
+   * changed to a redirect to /login?
+   */
   res.redirect(303, '/urls');
 });
 
 // Register user form
+// TODO: Redirect logged-in users to /urls
 app.get('/register', (req, res) => {
   const templateVars = { user: users[req.session.userId] };
   res.render('register', templateVars);
@@ -236,16 +250,17 @@ app.post('/register', (req, res) => {
 
   // Handle bad input (empty fields, email exists)
   if (!email || !password) {
-    res.status(400).send('400: Bad request');
+    res.status(400).send('400: Bad request—email and password can\'t be empty');
   }
   if (getUserWithEmail(email)) {
     res.status(409).send('409: email is taken');
   }
 
-  // Add new user to 'db'
+  // Add new user to db
   users[id] = {
     id,
     email: req.body.email,
+    // Save only the hashed password
     hashedPassword: bcrypt.hashSync(req.body.password, SALT_ROUNDS)
   };
 
