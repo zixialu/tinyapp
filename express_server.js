@@ -177,10 +177,17 @@ app.get('/urls/:id', (req, res) => {
     // Check that the user owns the link
   } else if (urlDatabase[shortURL].userId === req.session.userId) {
     const longURL = urlDatabase[shortURL].longURL;
+    const formattedDate = dateFormat(
+      urlDatabase[shortURL].dateCreated,
+      'isoDate'
+    );
     const templateVars = {
       shortURL,
       longURL,
-      user: users[req.session.userId]
+      visits: urlDatabase[shortURL].visits,
+      uniqueVisits: urlDatabase[shortURL].uniqueVisits,
+      user: users[req.session.userId],
+      formattedDate
     };
     res.render('urls_show', templateVars);
   } else {
@@ -219,7 +226,6 @@ app.get('/u/:shortURL', (req, res) => {
   } else {
     // Increment visits
     urlDatabase[req.params.shortURL].visits++;
-    // TODO: Implement increment unique visits
     // Increment unique visits based on cookies
     // Could be accomplished in other ways, such as by tracking fingerprints
     const visitCookieKey = 'visit' + req.params.shortURL;
@@ -228,6 +234,7 @@ app.get('/u/:shortURL', (req, res) => {
       req.session[visitCookieKey] = true;
       urlDatabase[req.params.shortURL].uniqueVisits++;
     }
+    console.log(req.session);
     // Redirect to target
     res.redirect(longURL);
   }
