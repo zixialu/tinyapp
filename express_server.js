@@ -168,7 +168,6 @@ app.get('/urls/new', (req, res) => {
 });
 
 // View/edit single url
-// TODO: Implement dateCreated, visitsCounter, uniqueVisitsCounter
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
   if (!urlDatabase[shortURL]) {
@@ -219,8 +218,7 @@ app.delete('/urls/:id/delete', (req, res) => {
 
 // Redirect to longURL
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  if (!longURL) {
+  if (!urlDatabase[req.params.shortURL]) {
     // Handle invalid shortURL
     res.status(400).send('400: Bad request');
   } else {
@@ -236,6 +234,7 @@ app.get('/u/:shortURL', (req, res) => {
     }
     console.log(req.session);
     // Redirect to target
+    const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
   }
 });
