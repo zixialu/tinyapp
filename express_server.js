@@ -23,7 +23,6 @@ app.use(
     keys: [process.env.COOKIE_SESSION_KEYS]
   })
 );
-console.log(process.env.COOKIE_SESSION_KEYS);
 app.use(methodOverride('_method'));
 
 // MARK: - Data
@@ -176,6 +175,7 @@ app.get('/login', (req, res) => {
 
 // Login
 app.post('/login', (req, res) => {
+  // Get userId for provided login email
   const userMatch = getUserWithEmail(req.body.email);
   // Handle bad credentials
   if (
@@ -186,8 +186,8 @@ app.post('/login', (req, res) => {
       .status(401)
       .send('401: The email or password you have entered is incorrect');
   } else {
+    // User and password hashes match, successful login
     req.session.userId = userMatch.id;
-    console.log(`Logged in, userId is ${req.session.userId}`);
     res.redirect(303, '/urls');
   }
 });
