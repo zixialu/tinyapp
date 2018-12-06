@@ -1,3 +1,8 @@
 {
-  "extends": "eslint-config-lighthouselabs"
+  "extends": "eslint-config-lighthouselabs",
+
+  "rules": {
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+    "quote-props": ["error", "consistent"]
+  }
 }
