@@ -195,10 +195,14 @@ app.get('/u/:shortURL', (req, res) => {
 // MARK: - Authentication
 
 // Login form
-// TODO: Redirect logged-in users to /urls
 app.get('/login', (req, res) => {
-  const templateVars = { user: users[req.session.userId] };
-  res.render('login', templateVars);
+  if (req.session.userId) {
+    // User is logged in, redirect to /urls
+    res.redirect('/urls');
+  } else {
+    const templateVars = { user: users[req.session.userId] };
+    res.render('login', templateVars);
+  }
 });
 
 // Login
@@ -233,10 +237,14 @@ app.post('/logout', (req, res) => {
 });
 
 // Register user form
-// TODO: Redirect logged-in users to /urls
 app.get('/register', (req, res) => {
-  const templateVars = { user: users[req.session.userId] };
-  res.render('register', templateVars);
+  if (req.session.userId) {
+    // User is logged in, redirect to /urls
+    res.redirect('/urls');
+  } else {
+    const templateVars = { user: users[req.session.userId] };
+    res.render('register', templateVars);
+  }
 });
 
 // POST user registration
