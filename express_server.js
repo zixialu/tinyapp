@@ -28,17 +28,17 @@ app.use(methodOverride('_method'));
 
 // MARK: - Data
 const urlDatabase = {
-  b2xVn2: { longURL: 'http://www.lighthouselabs.ca', userId: 'userRandomID' },
+  'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', userId: 'userRandomID' },
   '9sm5xK': { longURL: 'http://www.google.com', userId: 'userRandomID' }
 };
 
 const users = {
-  userRandomID: {
+  'userRandomID': {
     id: 'userRandomID',
     email: 'user@example.com',
     hashedPassword: bcrypt.hashSync('aaa', SALT_ROUNDS)
   },
-  user2RandomID: {
+  'user2RandomID': {
     id: 'user2RandomID',
     email: 'user2@example.com',
     hashedPassword: bcrypt.hashSync('dishwasher-funk', SALT_ROUNDS)
@@ -67,12 +67,10 @@ function generateRandomString() {
 
 // Returns the user given an email, or null if email can't be found
 function getUserWithEmail(email) {
-  for (userId in users) {
-    if (users[userId].email.toLowerCase() === email) {
-      return users[userId];
-    }
-  }
-  return null;
+  const matchingId = Object.keys(users).filter(userId => {
+    return users[userId].email === email;
+  })[0];
+  return users[matchingId];
 }
 
 // Returns the urls created by a user
