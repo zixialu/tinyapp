@@ -91,7 +91,7 @@ function getUsersURLs(userId) {
 
 // Url list
 app.get('/urls', (req, res) => {
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const templateVars = { urls: getUsersURLs(userId), user: users[userId] };
   res.render('urls_index', templateVars);
 });
@@ -106,7 +106,7 @@ app.post('/urls', (req, res) => {
   }
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userId: req.session.user_id
+    userId: req.session.userId
   };
 
   // Send a 303 redirect to /urls/<shortURL>
@@ -116,10 +116,10 @@ app.post('/urls', (req, res) => {
 // New url form
 app.get('/urls/new', (req, res) => {
   // Redirect guests to login form
-  if (!req.session.user_id) {
+  if (!req.session.userId) {
     res.redirect('/login');
   } else {
-    const templateVars = { user: users[req.session.user_id] };
+    const templateVars = { user: users[req.session.userId] };
     res.render('urls_new', templateVars);
   }
 });
@@ -127,12 +127,12 @@ app.get('/urls/new', (req, res) => {
 // View single url
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
-  if (urlDatabase[shortURL].userId === req.session.user_id) {
+  if (urlDatabase[shortURL].userId === req.session.userId) {
     const longURL = urlDatabase[shortURL].longURL;
     const templateVars = {
       shortURL,
       longURL,
-      user: users[req.session.user_id]
+      user: users[req.session.userId]
     };
     res.render('urls_show', templateVars);
   } else {
@@ -143,7 +143,7 @@ app.get('/urls/:id', (req, res) => {
 // Update url
 app.put('/urls/:id', (req, res) => {
   // Check if user has credentials to edit
-  if (urlDatabase[req.params.id].userId !== req.session.user_id) {
+  if (urlDatabase[req.params.id].userId !== req.session.userId) {
     res.status(401).send('401: You must be the owner of the url to edit it');
   } else {
     urlDatabase[req.params.id].longURL = req.body.longURL;
@@ -154,7 +154,7 @@ app.put('/urls/:id', (req, res) => {
 // Delete url
 app.delete('/urls/:id/delete', (req, res) => {
   // Check if user has credentials to delete
-  if (urlDatabase[req.params.id].userId !== req.session.user_id) {
+  if (urlDatabase[req.params.id].userId !== req.session.userId) {
     res.status(401).send('401: You must be the owner of the url to delete it');
   } else {
     delete urlDatabase[req.params.id];
@@ -172,7 +172,7 @@ app.get('/u/:shortURL', (req, res) => {
 
 // Login form
 app.get('/login', (req, res) => {
-  const templateVars = { user: users[req.session.user_id] };
+  const templateVars = { user: users[req.session.userId] };
   res.render('login', templateVars);
 });
 
@@ -188,9 +188,8 @@ app.post('/login', (req, res) => {
       .status(401)
       .send('401: The email or password you have entered is incorrect');
   } else {
-    // FIXME: Refactor all instances of user_id into camel case
-    req.session.user_id = userMatch.id;
-    console.log(`Logged in, user_id is ${req.session.user_id}`);
+    req.session.userId = userMatch.id;
+    console.log(`Logged in, userId is ${req.session.userId}`);
     res.redirect(303, '/urls');
   }
 });
@@ -203,7 +202,7 @@ app.post('/logout', (req, res) => {
 
 // Register user form
 app.get('/register', (req, res) => {
-  const templateVars = { user: users[req.session.user_id] };
+  const templateVars = { user: users[req.session.userId] };
   res.render('register', templateVars);
 });
 
@@ -232,7 +231,7 @@ app.post('/register', (req, res) => {
   };
 
   // Set cookie
-  req.session.user_id = id;
+  req.session.userId = id;
 
   res.redirect(303, '/urls');
 });
