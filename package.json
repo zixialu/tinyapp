@@ -4,7 +4,6 @@
   "description": "",
   "main": "express_server.js",
   "scripts": {
-    "test": "mocha",
     "start": "./node_modules/.bin/nodemon -L express_server.js"
   },
   "author": "Zixia Lu <zixialu@gmail.com>",
