@@ -1,8 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const methodOverride = require('method-override');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 const app = express();
 const PORT = 8080;
 const SALT_ROUNDS = 10;
@@ -10,9 +12,16 @@ const SALT_ROUNDS = 10;
 // Set view engine to ejs
 app.set('view engine', 'ejs');
 
+// Trust first proxy for cookie-session
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: [process.env.COOKIE_SESSION_KEYS]
+}));
+console.log(process.env.COOKIE_SESSION_KEYS);
 app.use(methodOverride('_method'));
 
 
@@ -80,7 +89,7 @@ function getUsersURLs(userId) {
 
 // Url list
 app.get('/urls', (req, res) => {
-  const userId = req.cookies['user_id'];
+  const userId = req.session.user_id;
   const templateVars = { urls: getUsersURLs(userId), user: users[userId] };
   res.render('urls_index', templateVars);
 });
@@ -95,7 +104,7 @@ app.post('/urls', (req, res) => {
   }
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userId: req.cookies['user_id']
+    userId: req.session.user_id
   };
 
   // Send a 303 redirect to /urls/<shortURL>
@@ -105,10 +114,10 @@ app.post('/urls', (req, res) => {
 // New url form
 app.get('/urls/new', (req, res) => {
   // Redirect guests to login form
-  if (!req.cookies['user_id']) {
+  if (!req.session.user_id) {
     res.redirect('/login');
   } else {
-    const templateVars = { user: users[req.cookies['user_id']] };
+    const templateVars = { user: users[req.session.user_id] };
     res.render('urls_new', templateVars);
   }
 
@@ -117,9 +126,9 @@ app.get('/urls/new', (req, res) => {
 // View single url
 app.get('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
-  if (urlDatabase[shortURL].userId === req.cookies['user_id']) {
+  if (urlDatabase[shortURL].userId === req.session.user_id) {
     const longURL = urlDatabase[shortURL].longURL;
-    const templateVars = { shortURL, longURL, user: users[req.cookies['user_id']] };
+    const templateVars = { shortURL, longURL, user: users[req.session.user_id] };
     res.render('urls_show', templateVars);
   } else {
     res.status(401).send('401: You must be the owner of the url to edit it');
@@ -129,7 +138,7 @@ app.get('/urls/:id', (req, res) => {
 // Update url
 app.put('/urls/:id', (req, res) => {
   // Check if user has credentials to edit
-  if (urlDatabase[req.params.id].userId !== req.cookies['user_id']) {
+  if (urlDatabase[req.params.id].userId !== req.session.user_id) {
     res.status(401).send('401: You must be the owner of the url to edit it');
   } else {
     urlDatabase[req.params.id].longURL = req.body.longURL;
@@ -140,7 +149,7 @@ app.put('/urls/:id', (req, res) => {
 // Delete url
 app.delete('/urls/:id/delete', (req, res) => {
   // Check if user has credentials to delete
-  if (urlDatabase[req.params.id].userId !== req.cookies['user_id']) {
+  if (urlDatabase[req.params.id].userId !== req.session.user_id) {
     res.status(401).send('401: You must be the owner of the url to delete it');
   } else {
     delete urlDatabase[req.params.id];
@@ -159,7 +168,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Login form
 app.get('/login', (req, res) => {
-  const templateVars = { user: users[req.cookies['user_id']] };
+  const templateVars = { user: users[req.session.user_id] };
   res.render('login', templateVars);
 });
 
@@ -170,20 +179,22 @@ app.post('/login', (req, res) => {
   if (!userMatch || !bcrypt.compareSync(req.body.password, userMatch.hashedPassword)) {
     res.status(401).send('401: The email or password you have entered is incorrect');
   } else {
-    res.cookie('user_id', userMatch.id);
+    // FIXME: Refactor all instances of user_id into camel case
+    req.session.user_id = userMatch.id;
+    console.log(`Logged in, user_id is ${req.session.user_id}`);
     res.redirect(303, '/urls');
   }
 });
 
 // Logout
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect(303, '/urls');
 });
 
 // Register user form
 app.get('/register', (req, res) => {
-  const templateVars = { user: users[req.cookies['user_id']] };
+  const templateVars = { user: users[req.session.user_id] };
   res.render('register', templateVars);
 });
 
@@ -208,7 +219,7 @@ app.post('/register', (req, res) => {
   };
 
   // Set cookie
-  res.cookie('user_id', id);
+  req.session.user_id = id;
 
   res.redirect(303, '/urls');
 });
