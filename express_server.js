@@ -217,6 +217,11 @@ app.delete('/urls/:id/delete', (req, res) => {
 });
 
 // Redirect to longURL
+/*
+ * FIXME: Logging out clears cookies, allowing a user to repeatedly increment
+ * the unique visits counter. Maybe create a second cookie session if possible
+ * to save login and visit data seperately?
+ */
 app.get('/u/:shortURL', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     // Handle invalid shortURL
