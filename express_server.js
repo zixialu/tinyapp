@@ -22,7 +22,6 @@ app.use(
   cookieSession({
     name: 'session',
     keys: [process.env.COOKIE_SESSION_KEY],
-
     // Cookie Options
     // Persist cookie for 24 hours
     maxAge: 24 * 60 * 60 * 1000
@@ -36,15 +35,15 @@ const urlDatabase = {
     longURL: 'http://www.lighthouselabs.ca',
     userId: 'userRandomID',
     dateCreated: new Date(),
-    visits: 0,
-    uniqueVisits: 0
+    visits: [],
+    uniqueVisitors: []
   },
   '9sm5xK': {
     longURL: 'http://www.google.com',
     userId: 'userRandomID',
     dateCreated: new Date(),
-    visits: 0,
-    uniqueVisits: 0
+    visits: [],
+    uniqueVisitors: []
   }
 };
 
@@ -97,8 +96,25 @@ function getUsersURLs(userId) {
       usersUrls[shortURL] = urlDatabase[shortURL];
     }
   }
-
   return usersUrls;
+}
+
+// Log visits to a /u/:shortURL redirect
+function logVisit(visitorId, shortURL) {
+  // Log visit
+  urlDatabase[shortURL].visits.push({
+    timestamp: new Date(),
+    visitorId: visitorId
+  });
+
+  // Update uniqueVisitors
+  if (
+    !urlDatabase[shortURL].uniqueVisitors.filter(element => {
+      return element === visitorId;
+    })[0]
+  ) {
+    urlDatabase[shortURL].uniqueVisitors.push(visitorId);
+  }
 }
 
 // MARK: - Endpoints
@@ -183,8 +199,8 @@ app.get('/urls/:id', (req, res) => {
     const templateVars = {
       shortURL,
       longURL,
-      visits: urlDatabase[shortURL].visits,
-      uniqueVisits: urlDatabase[shortURL].uniqueVisits,
+      visits: urlDatabase[shortURL].visits.length,
+      uniqueVisits: urlDatabase[shortURL].uniqueVisitors.length,
       user: users[req.session.userId],
       formattedDate
     };
@@ -217,26 +233,18 @@ app.delete('/urls/:id/delete', (req, res) => {
 });
 
 // Redirect to longURL
-/*
- * FIXME: Logging out clears cookies, allowing a user to repeatedly increment
- * the unique visits counter. Maybe create a second cookie session if possible
- * to save login and visit data seperately?
- */
 app.get('/u/:shortURL', (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     // Handle invalid shortURL
     res.status(400).send('400: Bad request');
   } else {
-    // Increment visits
-    urlDatabase[req.params.shortURL].visits++;
-    // Increment unique visits based on cookies
-    // Could be accomplished in other ways, such as by tracking fingerprints
-    const visitCookieKey = 'visit' + req.params.shortURL;
-    if (!req.session[visitCookieKey]) {
-      // User has not visitied this shortURL before; count it as a unique visit
-      req.session[visitCookieKey] = true;
-      urlDatabase[req.params.shortURL].uniqueVisits++;
+    // Ensure the visitor has a visitorId cookie
+    // FIXME: Ensure this id is unique or refactor generateRandomString
+    if (!req.session.visitorId) {
+      req.session.visitorId = generateRandomString();
     }
+
+    logVisit(req.session.visitorId, req.params.shortURL);
     // Redirect to target
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
@@ -277,13 +285,8 @@ app.post('/login', (req, res) => {
 
 // Logout
 app.post('/logout', (req, res) => {
-  // Delete cookie
-  req.session = null;
-  /*
-   * FIXME: Requirements state logout should redirect to /urls, but accessing
-   * /urls while logged out will redirect to a 401 error page. Should this be
-   * changed to a redirect to /login?
-   */
+  // Delete cookie's userId
+  req.session.userId = null;
   res.redirect(303, '/urls');
 });
 
