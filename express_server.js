@@ -163,8 +163,8 @@ app.post('/urls', (req, res) => {
       longURL: req.body.longURL,
       userId: req.session.userId,
       dateCreated: new Date(),
-      visits: 0,
-      uniqueVisits: 0
+      visits: [],
+      uniqueVisitors: []
     };
 
     // Send a 303 redirect to /urls/<shortURL>
